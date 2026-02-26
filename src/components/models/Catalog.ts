@@ -6,11 +6,11 @@ export class Catalog {
 
   // принимаем массив товаров и сохраняем
   setItems(items: IProduct[]): void {
-  if (Array.isArray(items)) {
-        this._items = items;
+    if (Array.isArray(items)) {
+      this._items = items;
     } else {
-        this._items = [];
-        console.warn('Catalog.setItems: передан не массив', items);
+      this._items = [];
+      console.warn("Catalog.setItems: передан не массив", items);
     }
   }
 

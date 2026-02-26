@@ -6,7 +6,7 @@ import { OrderData } from "./components/models/OrderData";
 
 import { API } from "./components/api/API";
 
-import { API_URL } from './utils/constants';
+import { API_URL } from "./utils/constants";
 // импорт тест данных
 import { apiProducts } from "./utils/data";
 
@@ -15,22 +15,20 @@ const basket = new Basket();
 const catalog = new Catalog();
 const order = new OrderData();
 
-
-
 //создаем экземпляр API
 const appApi = new API(API_URL);
 
 //загрузка товаров с сервера
-appApi.getProducts()
+appApi
+  .getProducts()
   .then((items) => {
     catalog.setItems(items);
     console.log("Товары загружены:", catalog.getItems());
-    })
+  })
   .catch((err) => {
     console.error("Товары не удалось загрузить", err);
   });
-console.log('API_URL:', API_URL);
-
+console.log("API_URL:", API_URL);
 
 // ---ТЕСТИМ CATALOG---
 console.log("---ТЕСТ Catalog---");

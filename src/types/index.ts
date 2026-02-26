@@ -1,11 +1,12 @@
-export type ApiPostMethods = 'POST' | 'PUT' | 'DELETE';
+export type ApiPostMethods = "POST" | "PUT" | "DELETE";
 
 export interface IApi {
-    get<T extends object>(uri: string): Promise<T>;
-    post<T extends object>(
-        uri: string,
-         data: object,
-          method?: ApiPostMethods): Promise<T>;
+  get<T extends object>(uri: string): Promise<T>;
+  post<T extends object>(
+    uri: string,
+    data: object,
+    method?: ApiPostMethods,
+  ): Promise<T>;
 }
 
 // мой код,добавляю интерфейсы
@@ -26,14 +27,10 @@ export interface IProduct {
 export interface IBuyer {
   email: string;
   phone: string;
-  address: string; 
+  address: string;
   payment: TPayment;
 }
- 
+
 // способ оплаты
 
-export type TPayment = 'online' | 'cash';
-
-
-
-
+export type TPayment = "online" | "cash";
