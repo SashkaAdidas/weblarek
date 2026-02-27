@@ -5,6 +5,7 @@ import { Catalog } from "./components/models/Catalog";
 import { OrderData } from "./components/models/OrderData";
 
 import { API } from "./components/api/API";
+import { Api } from "./components/base/Api";
 
 import { API_URL } from "./utils/constants";
 // импорт тест данных
@@ -15,8 +16,9 @@ const basket = new Basket();
 const catalog = new Catalog();
 const order = new OrderData();
 
-//создаем экземпляр API
-const appApi = new API(API_URL);
+const apiClient = new Api(API_URL);
+//передаем клиент в API
+const appApi = new API(apiClient);
 
 //загрузка товаров с сервера
 appApi
@@ -85,8 +87,3 @@ console.log("Способ оплаты:", order.getPayment());
 console.log("Email:", order.getEmail());
 console.log("Phone:", order.getPhone());
 console.log("Address:", order.getAddress());
-
-console.log("Проверка доставки:", order.validateDelivery());
-console.log("Проверка контактов:", order.validateContact());
-
-console.log("Данные для отправки:", order.getBuyerData());

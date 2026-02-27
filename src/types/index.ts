@@ -9,8 +9,6 @@ export interface IApi {
   ): Promise<T>;
 }
 
-// мой код,добавляю интерфейсы
-
 // товар
 
 export interface IProduct {

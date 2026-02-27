@@ -45,23 +45,22 @@ export class OrderData {
     return this._address;
   }
 
-  // проверка поля адреса,заполнено ли
-  validateDelivery(): boolean {
-    return Boolean(this._address);
-  }
+  validate(): Partial<Record<keyof IBuyer, string>> {
+    const errors: Partial<Record<keyof IBuyer, string>> = {};
 
-  // проверка email и телефона, заполнено ли
-  validateContact(): boolean {
-    return Boolean(this._email && this._phone);
-  }
+    if (!this._payment) {
+      errors.payment = "Не выбран способ оплаты";
+    }
+    if (!this._email) {
+      errors.email = "Укажите email";
+    }
+    if (!this._phone) {
+      errors.phone = "Укажите телефон";
+    }
+    if (!this._address) {
+      errors.address = "Укажите адрес доставки";
+    }
 
-  //вернет обьект с данными покупателя для отправки
-  getBuyerData(): IBuyer {
-    return {
-      payment: this._payment as TPayment,
-      email: this._email,
-      phone: this._phone,
-      address: this._address,
-    };
+    return errors;
   }
 }

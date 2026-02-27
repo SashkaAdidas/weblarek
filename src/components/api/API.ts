@@ -1,4 +1,4 @@
-import { Api } from "../base/Api";
+import { IApi } from "../../types";
 import { IProduct, IBuyer, TPayment } from "../../types";
 
 export interface IOrderData extends IBuyer {
@@ -16,10 +16,10 @@ export interface IProductList {
 }
 
 export class API {
-  private _api: Api;
+  private _api: IApi;
 
-  constructor(baseUrl: string) {
-    this._api = new Api(baseUrl);
+  constructor(api: IApi) {
+    this._api = api;
   }
 
   getProducts(): Promise<IProduct[]> {
