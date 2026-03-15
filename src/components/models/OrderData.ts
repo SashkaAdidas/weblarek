@@ -7,7 +7,7 @@ export class OrderData {
   private _address: string = "";
 
   // установка способа оплаты
-  setPayment(payment: TPayment): void {
+  setPayment(payment: TPayment|null): void {
     this._payment = payment;
   }
 
