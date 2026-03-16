@@ -7,9 +7,9 @@ interface IModal {
 }
 
 export class Modal extends Component<IModal> {
-  protected modalContainer: HTMLElement;
+  protected modalContent: HTMLElement;
   protected closeButton: HTMLButtonElement;
-  private isOpen = false; // Для защиты от повторного открытия
+  private isOpen = false;
 
   constructor(
     container: HTMLElement,
@@ -18,7 +18,7 @@ export class Modal extends Component<IModal> {
     super(container);
 
     // Ищем контейнер и кнопку закрытия
-    this.modalContainer = ensureElement<HTMLElement>(
+    this.modalContent = ensureElement<HTMLElement>(
       ".modal__container",
       this.container,
     );
@@ -35,7 +35,7 @@ export class Modal extends Component<IModal> {
     });
 
     // Закрытие по крестику
-    this.closeButton.addEventListener("click", () => {
+    this.closeButton.addEventListener("click", (e) => {
       this.close();
     });
 
@@ -47,7 +47,9 @@ export class Modal extends Component<IModal> {
 
   // Устанавливаем контент внутрь модального окна
   set content(value: HTMLElement) {
-    this.modalContainer.replaceChildren(value);
+    this.modalContent.replaceChildren();
+    this.modalContent.appendChild(this.closeButton);
+    this.modalContent.appendChild(value);
   }
 
   // Открываем модалку
@@ -65,7 +67,7 @@ export class Modal extends Component<IModal> {
     this.isOpen = false;
     this.container.classList.remove("modal_active");
     document.body.style.overflow = "";
-    this.events.emit("modal:close"); // Событие для других компонентов
+    this.events.emit("modal:close");
   }
 
   // Рендерим и открываем модалку

@@ -1,35 +1,25 @@
 import { Form } from "./Form";
-import { IEvents } from "../base/Events";
 import { ensureElement } from "../../utils/utils";
+import { IEvents } from "../base/Events";
 
-interface IOrderFormState {
+interface IFormOrderData {
   address: string;
   payment: string;
 }
 
-export class OrderForm extends Form<IOrderFormState> {
+export class FormOrder extends Form<IFormOrderData> {
   protected addressInput: HTMLInputElement;
-  protected paymentButtons: HTMLButtonElement[];
-  protected errorsElement: HTMLElement;
+  protected paymentButtons: NodeListOf<HTMLButtonElement>;
 
   constructor(container: HTMLElement, events: IEvents) {
     super(container, events);
 
     this.addressInput = ensureElement<HTMLInputElement>(
-      "input[name=address]",
+      "input[name='address']",
       this.container,
     );
-    this.paymentButtons = Array.from(
-      this.container.querySelectorAll<HTMLButtonElement>(".button_alt"),
-    );
-    this.errorsElement = ensureElement<HTMLElement>(
-      ".form__errors",
-      this.container,
-    );
-    this.submitButton = ensureElement<HTMLButtonElement>(
-      'button[type="submit"]',
-      this.container,
-    );
+    this.paymentButtons =
+      this.container.querySelectorAll<HTMLButtonElement>(".button_alt");
 
     // Слушаем изменения адреса
     this.addressInput.addEventListener("input", () => {
@@ -58,26 +48,5 @@ export class OrderForm extends Form<IOrderFormState> {
     this.paymentButtons.forEach((button) => {
       button.classList.toggle("button_alt-active", button.name === method);
     });
-  }
-
-  clear() {
-    this.addressInput.value = "";
-    this.paymentButtons.forEach((btn) =>
-      btn.classList.remove("button_alt-active"),
-    );
-    this.errors = [];
-    this.valid = false;
-  }
-  set errors(value: string[]) {
-    this.errorsElement.textContent = value.join(", ");
-  }
-  set valid(value: boolean) {
-    console.log(
-      "Устанавливаю кнопку как",
-      value ? "активную" : "заблокированную",
-    );
-    if (this.submitButton) {
-      this.submitButton.disabled = !value;
-    }
   }
 }

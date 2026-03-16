@@ -1,5 +1,5 @@
 import { IApi } from "../../types";
-import { IProduct, IBuyer, TPayment } from "../../types";
+import { IProduct, IBuyer } from "../../types";
 
 export interface IOrderData extends IBuyer {
   total: number;

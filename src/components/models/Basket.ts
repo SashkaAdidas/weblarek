@@ -26,8 +26,10 @@ export class Basket {
 
   // вернет сумму товаров
   getTotal(): number {
-    return this._items.reduce((sum, item) => sum + item.price!, 0);
-  }
+  return this._items.reduce((sum, item) => {
+    return sum + (typeof item.price === 'number' ? item.price : 0);
+  }, 0);
+}
 
   // вернет количество товаров
   getTotalCount(): number {

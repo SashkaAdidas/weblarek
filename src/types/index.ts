@@ -1,3 +1,10 @@
+export type TCategory =
+  | "софт-скил"
+  | "хард-скил"
+  | "кнопка"
+  | "дополнительное"
+  | "другое";
+
 export type ApiPostMethods = "POST" | "PUT" | "DELETE";
 
 export interface IApi {
@@ -9,8 +16,7 @@ export interface IApi {
   ): Promise<T>;
 }
 
-// товар
-
+// Товар
 export interface IProduct {
   id: string;
   title: string;
@@ -20,15 +26,30 @@ export interface IProduct {
   price: number | null;
 }
 
-// покупатель
+// Список товаров
+export interface IProductList {
+  total: number;
+  items: IProduct[];
+}
 
+// Покупатель
 export interface IBuyer {
   email: string;
   phone: string;
-  address: string;
-  payment: TPayment;
 }
 
-// способ оплаты
+// Полный заказ
+export interface IOrderData extends IBuyer {
+  payment: TPayment; // "online" | "cash"
+  address: string;
+  total: number;
+  items: string[]; // массив ID товаров
+}
 
+// Результат заказа — минимальный объект
+export interface IOrderResult {
+  total: number;
+}
+
+// Способ оплаты
 export type TPayment = "online" | "cash";

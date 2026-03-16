@@ -3,13 +3,8 @@ import "./scss/styles.scss";
 import { Basket } from "./components/models/Basket";
 import { Catalog } from "./components/models/Catalog";
 import { OrderData } from "./components/models/OrderData";
-
 import { API } from "./components/api/API";
 import { Api } from "./components/base/Api";
-
-import { API_URL } from "./utils/constants";
-import { apiProducts } from "./utils/data";
-
 import { EventEmitter } from "./components/base/Events";
 
 // Компоненты View
@@ -18,7 +13,15 @@ import { CardCatalog } from "./components/views/CardCatalog";
 import { CardPreview } from "./components/views/CardPreview";
 import { BasketView } from "./components/views/BasketView";
 import { OrderForm } from "./components/views/OrderForm";
+import { FormContacts } from "./components/views/FormContacts";
 import { Success } from "./components/views/Success";
+
+// Типы
+import type { IProduct, IOrderData } from "./types";
+
+// Утилиты
+import { API_URL } from "./utils/constants";
+import { apiProducts } from "./utils/data";
 
 // Шаблоны
 const cardCatalogTemplate =
@@ -56,28 +59,13 @@ const events = new EventEmitter();
 const apiClient = new Api(API_URL);
 const appApi = new API(apiClient);
 
-// Типы
-interface IProduct {
-  id: string;
-  title: string;
-  description: string;
-  category: string;
-  image: string;
-  price: number | null;
-}
-
-type TPayment = "cash" | "online";
-
 // Представления
 const modal = new Modal(modalContainer, events);
 const basketView = new BasketView(cloneTemplate(basketTemplate), events);
 const orderForm = new OrderForm(cloneTemplate(orderFormTemplate), events);
 const successView = new Success(cloneTemplate(successTemplate), events);
 
-// Отладка
-(window as any).orderForm = orderForm;
-
-// === УТИЛИТЫ ===
+// Утилиты
 function cloneTemplate(template: HTMLTemplateElement): HTMLElement {
   const element = template.content.firstElementChild?.cloneNode(true);
   if (!element || !(element instanceof HTMLElement)) {
@@ -90,13 +78,25 @@ function isInBasket(id: string): boolean {
   return basket.getItems().some((item) => item.id === id);
 }
 
+// Обновление валидации шага 1 
+function updateOrderStep1() {
+  const errors = order.validateStep1();
+  orderForm.valid = errors.length === 0;
+  orderForm.errors = errors;
+}
+
+// Универсальная функция для обновления полей заказа
 function setOrderField(field: string, value: string) {
   switch (field) {
     case "payment":
-      order.setPayment(value as TPayment);
+      if (value === "online" || value === "cash") {
+        order.setPayment(value);
+        updateOrderStep1();
+      }
       break;
     case "address":
       order.setAddress(value);
+      updateOrderStep1();
       break;
     case "email":
       order.setEmail(value);
@@ -107,36 +107,10 @@ function setOrderField(field: string, value: string) {
   }
 }
 
-// Валидация шага 1
-function validateStep1(): string[] {
-  const errors: string[] = [];
-  if (!order.getPayment()) {
-    errors.push("Не выбран способ оплаты");
-  }
-  if (!order.getAddress()) {
-    errors.push("Не указан адрес доставки");
-  }
-  return errors;
-}
-
-// Валидация шага 2
-function validateStep2(): string[] {
-  const errors: string[] = [];
-  if (!order.getEmail()) {
-    errors.push("Требуется email");
-  }
-  if (!order.getPhone()) {
-    errors.push("Требуется телефон");
-  }
-  return errors;
-}
-
+// Рендер товаров
 function renderProductsAsElements(items: IProduct[]): HTMLElement[] {
   return items.map((item) => {
     const cardElement = cloneTemplate(cardCatalogTemplate!);
-    if (!cardElement || !(cardElement instanceof HTMLElement)) {
-      throw new Error("Не удалось клонировать карточку товара");
-    }
     const card = new CardCatalog(cardElement, {
       onClick: () => events.emit("product:select", item),
     });
@@ -151,7 +125,7 @@ function isBasketEmpty(): boolean {
 
 let currentStep = 1;
 
-// === ЛОГИКА ===
+//  ЛОГИКА 
 
 // Загрузка товаров
 appApi
@@ -213,92 +187,90 @@ events.on("basket:remove", ({ id }: { id: string }) => {
 });
 
 events.on("basket:order", () => {
+  order.clear();
   modal.render({ content: orderForm.render() });
-  const errors1 = validateStep1();
-  orderForm.valid = errors1.length === 0;
+  updateOrderStep1(); 
 });
 
-events.on(
-  "form:change",
-  ({ field, value }: { field: string; value: string }) => {
-    setOrderField(field, value);
-    const errors = currentStep === 1 ? validateStep1() : validateStep2();
-    orderForm.valid = errors.length === 0;
-  },
-);
+// Обработка выбора оплаты
+events.on<{ value: string }>("order:paymentChange", ({ value }) => {
+  if (value === "card") setOrderField("payment", "online");
+  else if (value === "cash") setOrderField("payment", "cash");
+});
 
-events.on("order:submit", () => {
+// Обработка ввода адреса
+events.on<{ value: string }>("order:addressChange", ({ value }) => {
+  setOrderField("address", value);
+});
+
+// Обработка отправки формы
+let contactsForm: FormContacts | null = null;
+
+events.on("form:submit", () => {
   if (currentStep === 1) {
-    const errors1 = validateStep1();
-    if (errors1.length === 0) {
-      currentStep = 2;
+    // шаг 1: оплата  адрес
+    const errors = order.validateStep1();
+    if (errors.length > 0) return;
 
-      const contactsElement = cloneTemplate(contactsTemplate);
-      const contactsForm = new OrderForm(contactsElement, events);
+    //  шаг 2
+    currentStep = 2;
+    const contactsTemplateElement = cloneTemplate(contactsTemplate);
+    contactsForm = new FormContacts(contactsTemplateElement, events);
+    contactsForm.email = order.getEmail();
+    contactsForm.phone = order.getPhone();
 
-      contactsForm.email = order.getEmail();
-      contactsForm.phone = order.getPhone();
-
-      modal.render({ content: contactsForm.render() });
-
-      // --- КЛЮЧЕВАЯ ЧАСТЬ: валидация при старте ---
-      const validateAndSync = () => {
-        const errors = validateStep2();
-        contactsForm.valid = errors.length === 0; // ← это делает кнопку disabled
-
-        if (errors.includes("Требуется email")) {
-        } else {
-          contactsForm.hideEmailError();
+    // Обновление валидности при изменении полей
+    events.on<{ field: string; value: string }>(
+      "contacts:change",
+      ({ field, value }) => {
+        setOrderField(field, value);
+        if (contactsForm) {
+          const step2Errors = order.validateStep2();
+          contactsForm.valid = step2Errors.length === 0;
+          contactsForm.errors = step2Errors;
         }
-      };
+      },
+    );
 
-      // Запускаем валидацию сразу после рендера
-      validateAndSync();
+    // Первоначальная валидация шага 2
+    const step2Errors = order.validateStep2();
+    contactsForm.valid = step2Errors.length === 0;
+    contactsForm.errors = step2Errors;
 
-      // Слушаем ввод
-      contactsElement.addEventListener("input", (e) => {
-        const target = e.target as HTMLInputElement;
-        if (target === contactsForm.emailField) {
-          order.setEmail(target.value);
-        } else if (target === contactsForm.phoneField) {
-          order.setPhone(target.value);
-        }
-        validateAndSync(); // перепроверяем
-      });
-
-      // Обработка клика по кнопке
-      contactsElement.addEventListener("click", (e) => {
-        const target = e.target as HTMLElement;
-        const submitButton = contactsElement.querySelector(
-          ".button:not(.button_alt):not([name])",
-        );
-        if (submitButton && target.closest(".button") === submitButton) {
-          e.preventDefault();
-          events.emit("order:submit");
-        }
-      });
-    }
+    modal.render({ content: contactsForm.render() });
   } else {
-    // Шаг 2: окончательная проверка
-    const errors2 = validateStep2();
-    if (errors2.length > 0) {
+    // Повторная валидация перед отправкой
+    const errors = order.validateStep2();
+    if (errors.length > 0) {
+      if (contactsForm) {
+        contactsForm.errors = errors; 
+      }
       return;
     }
 
+    // Проверка суммы
+    const total = basket.getTotal();
+    if (total <= 0) {
+      console.error("Сумма заказа должна быть больше 0");
+      return;
+    }
+
+    // Подготовка данных
+    const orderData: IOrderData = {
+      payment: order.getPayment() ?? "cash",
+      email: order.getEmail(),
+      phone: order.getPhone(),
+      address: order.getAddress(),
+      total,
+      items: basket.getItems().map((i) => i.id),
+    };
+
+    // Отправка заказа
     appApi
-      .postOrder({
-        payment: order.getPayment() || "cash",
-        email: order.getEmail(),
-        phone: order.getPhone(),
-        address: order.getAddress(),
-        total: basket.getTotal(),
-        items: basket.getItems().map((i) => i.id),
-      })
+      .postOrder(orderData)
       .then((result) => {
         basket.clear();
-        modal.render({
-          content: successView.render({ total: result.total }),
-        });
+        modal.render({ content: successView.render({ total: result.total }) });
       })
       .catch((err) => {
         console.error("Ошибка при отправке заказа:", err);
@@ -306,14 +278,13 @@ events.on("order:submit", () => {
   }
 });
 
-// МОДАЛ CLOUS
+// Закрытие модалки 
 events.on("modal:close", () => {
   currentStep = 1;
-  orderForm.gotoFirstStep();
-  orderForm.hideEmailError();
+  orderForm.errors = [];
 });
 
-// Открытие корзины по клику
+// Открытие корзины
 const basketButton = document.querySelector(".header__basket");
 if (!basketButton) throw new Error("Не найдена кнопка корзины .header__basket");
 basketButton.addEventListener("click", () => {

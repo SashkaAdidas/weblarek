@@ -1,4 +1,4 @@
-import { IBuyer, TPayment } from "../../types";
+import { TPayment } from "../../types";
 
 export class OrderData {
   private _payment: TPayment | null = null;
@@ -6,61 +6,56 @@ export class OrderData {
   private _phone: string = "";
   private _address: string = "";
 
-  // установка способа оплаты
-  setPayment(payment: TPayment|null): void {
-    this._payment = payment;
+  setPayment(value: TPayment): void {
+    this._payment = value;
+    console.log("setPayment вызван:", value);
   }
 
-  // вернет способ оплаты
   getPayment(): TPayment | null {
     return this._payment;
   }
 
-  // установит email
   setEmail(value: string): void {
     this._email = value;
   }
 
-  // вернет email
   getEmail(): string {
     return this._email;
   }
 
-  //установит телефон
   setPhone(value: string): void {
     this._phone = value;
   }
 
-  // вернет телефон
-  getPhone() {
+  getPhone(): string {
     return this._phone;
   }
 
-  // установит адрес
   setAddress(value: string): void {
     this._address = value;
   }
-  // вернет адрес
-  getAddress() {
+
+  getAddress(): string {
     return this._address;
   }
 
-  validate(): Partial<Record<keyof IBuyer, string>> {
-    const errors: Partial<Record<keyof IBuyer, string>> = {};
-
-    if (!this._payment) {
-      errors.payment = "Не выбран способ оплаты";
-    }
-    if (!this._email) {
-      errors.email = "Укажите email";
-    }
-    if (!this._phone) {
-      errors.phone = "Укажите телефон";
-    }
-    if (!this._address) {
-      errors.address = "Укажите адрес доставки";
-    }
-
+  validateStep1(): string[] {
+    const errors: string[] = [];
+    if (!this._payment) errors.push("Не выбран способ оплаты");
+    if (!this._address) errors.push("Не указан адрес доставки");
     return errors;
+  }
+
+  validateStep2(): string[] {
+    const errors: string[] = [];
+    if (!this._email) errors.push("Требуется email");
+    if (!this._phone) errors.push("Требуется телефон");
+    return errors;
+  }
+  clear() {
+    this._payment = null;
+    this._address = "";
+    this._email = "";
+    this._phone = "";
   }
 }
