@@ -48,7 +48,6 @@ export class BasketView extends Component<IBasket> {
         const cardElement = document.createElement("li");
         cardElement.className = "basket__item";
 
-        //  Беру  класс .basket__item-index
         const numberBadge = document.createElement("span");
         numberBadge.className = "basket__item-index";
         numberBadge.style.backgroundColor = "black";

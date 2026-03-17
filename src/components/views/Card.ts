@@ -28,7 +28,6 @@ export class Card extends Component<ICard> {
       ".card__price",
       this.container,
     );
-    // Ищю элемент категории, если есть
     this.categoryElement =
       this.container.querySelector<HTMLElement>(".card__category");
   }
@@ -51,7 +50,6 @@ export class Card extends Component<ICard> {
     }
   }
 
-  // Новый сеттер: устанавливает категорию и применяет CSS-класс
   set category(value: string) {
     if (this.categoryElement) {
       this.categoryElement.textContent = value;
