@@ -194,3 +194,83 @@ getPhone(): string — возвращает телефон.
 setAddress(value: string): void — устанавливает адрес.
 getAddress(): string — возвращает адрес.
 validate(): Partial<Record<keyof IBuyer, string>> — проверяет заполнение всех полей и возвращает объект с текстами ошибок (если есть). Например: { email: 'Укажите email' }.
+
+### Проект построен по принципам MVP (Model-View-Presenter) и использует модульную архитектуру. Основные директории:
+
+- `src/` — исходный код приложения
+  - `components/` — компоненты интерфейса и логики
+    - `base/` — базовые классы `Component`, `EventEmitter`
+    - `models/` — модели данных (`OrderData`, `Basket`)
+    - `views/` — представления (формы, корзина, карточки)
+    - `api/` — взаимодействие с сервером
+  - `types/` — TypeScript-интерфейсы (`IProduct`, `IBuyer` и др.)
+  - `utils/` — вспомогательные функции (`ensureElement`, `cloneTemplate`)
+  - `common.blocks/` — SCSS-миксины и блоки
+  - `vendor/` — сторонние стили (normalize.css)
+
+## Архитектурный паттерн: MVP
+
+Приложение использует **MVP (Model-View-Presenter)**:
+
+- **Model** — отвечает за данные и бизнес-логику  
+  Пример: `OrderData`, `Basket`, `API`
+- **View** — отображает данные и обрабатывает ввод  
+  Пример: `BasketView`, `FormContacts`, `CardPreview`
+- **Presenter** — реализован неявно через `Events` — связывает модель и вид, обрабатывает действия пользователя
+
+Связь между компонентами осуществляется через **событийную систему** (`IEvents`), что обеспечивает слабую связанность.
+
+## Описание ключевых классов
+
+### `API`
+Класс для работы с сервером.
+
+- **Назначение**: Загружает товары, отправляет заказ.
+- **Методы**:
+  - `getProducts(): Promise<IProduct[]>`
+  - `postOrder(orderData: IOrderData): Promise<IOrderResult>`
+
+### `OrderData`
+Модель данных заказа.
+
+- **Назначение**: Хранит способ оплаты, адрес, email, телефон.
+- **Конструктор**: `constructor(events: IEvents)` — принимает систему событий.
+- **Поля**:
+  - `_payment: TPayment | null`
+  - `_address, _email, _phone: string`
+- **Методы**:
+  - `setPayment(value: TPayment)`, `getPayment()`
+  - `setEmail(value: string)`, `getEmail()`
+  - `validateStep1(): string[]` — проверка шага 1
+  - `validateStep2(): string[]` — проверка шага 2
+  - `clear()` — сброс данных и событие `order:change`
+
+### `Basket`
+Модель корзины.
+
+- **Назначение**: Управляет списком товаров.
+- **Методы**:
+  - `add(item: IProduct)`
+  - `remove(id: string)`
+  - `getItems(): IProduct[]`
+  - `getTotal(): number`
+
+### `BasketView`
+Представление корзины.
+
+- **Назначение**: Отображает список товаров, цену, итог, кнопку заказа.
+- **Конструктор**: `constructor(container: HTMLElement, events: IEvents)`
+- **Поля**:
+  - `listContainer`, `totalElement`, `button` — DOM-элементы
+- **Методы**:
+  - `set items(...)` — рендерит товары, показывает номер, название, цену, кнопку удаления
+  - `set total(value)` — обновляет итог
+  - `set disabled(value)` — блокирует кнопку
+
+
+## Типы данных
+
+- `IProduct`: `{ id: string; title: string; price: number | null }`
+- `IBuyer`: `{ email: string; phone: string; address: string; payment: string }`
+- `IOrderData`: расширяет `IBuyer` + `items: string[]`, `total: number`
+- `TPayment`: `"online" | "cash"`

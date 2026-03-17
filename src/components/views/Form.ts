@@ -11,16 +11,19 @@ export abstract class Form<T> extends Component<IFormState> {
   protected submitButton: HTMLButtonElement;
   protected errorsElement: HTMLElement;
 
-  constructor(container: HTMLElement, protected events: IEvents) {
+  constructor(
+    container: HTMLElement,
+    protected events: IEvents,
+  ) {
     super(container);
 
     this.submitButton = ensureElement<HTMLButtonElement>(
       "button[type=submit]",
-      this.container
+      this.container,
     );
     this.errorsElement = ensureElement<HTMLElement>(
       ".form__errors",
-      this.container
+      this.container,
     );
 
     this.container.addEventListener("submit", (e) => {

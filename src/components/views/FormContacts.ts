@@ -31,7 +31,7 @@ export class FormContacts extends Form<IFormContactsData> {
       this.container,
     );
 
-    // Слушаем изменения полей
+    // Слушаю изменения полей
     [this.emailInput, this.phoneInput].forEach((input) => {
       input.addEventListener("input", () => {
         this.events.emit("contacts:change", {

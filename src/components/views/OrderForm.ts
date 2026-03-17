@@ -11,6 +11,7 @@ export class OrderForm extends Form<IOrderFormState> {
   protected addressInput: HTMLInputElement;
   protected paymentButtons: HTMLButtonElement[];
   protected errorsElement: HTMLElement;
+  protected _payment: string | null = null;
 
   constructor(container: HTMLElement, events: IEvents) {
     super(container, events);
@@ -50,11 +51,20 @@ export class OrderForm extends Form<IOrderFormState> {
     });
   }
 
-  set address(value: string) {
-    this.addressInput.value = value;
+  set payment(value: string | null) {
+    this._payment = value;
+    this.selectPayment(value);
+    if (value) {
+      this.events.emit("order:paymentChange", { value });
+    }
   }
 
-  selectPayment(method: string) {
+  set address(value: string) {
+    this.addressInput.value = value;
+    this.events.emit("order:addressChange", { value });
+  }
+
+  selectPayment(method: string | null) {
     this.paymentButtons.forEach((button) => {
       button.classList.toggle("button_alt-active", button.name === method);
     });
@@ -72,10 +82,6 @@ export class OrderForm extends Form<IOrderFormState> {
     this.errorsElement.textContent = value.join(", ");
   }
   set valid(value: boolean) {
-    console.log(
-      "Устанавливаю кнопку как",
-      value ? "активную" : "заблокированную",
-    );
     if (this.submitButton) {
       this.submitButton.disabled = !value;
     }

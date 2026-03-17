@@ -17,7 +17,7 @@ export class Modal extends Component<IModal> {
   ) {
     super(container);
 
-    // Ищем контейнер и кнопку закрытия
+    // Ищю контейнер и кнопку закрытия
     this.modalContent = ensureElement<HTMLElement>(
       ".modal__container",
       this.container,
@@ -45,14 +45,14 @@ export class Modal extends Component<IModal> {
     });
   }
 
-  // Устанавливаем контент внутрь модального окна
+  // Устанавливаю контент внутрь модального окна
   set content(value: HTMLElement) {
     this.modalContent.replaceChildren();
     this.modalContent.appendChild(this.closeButton);
     this.modalContent.appendChild(value);
   }
 
-  // Открываем модалку
+  // Открываю модалку
   open() {
     if (this.isOpen) return;
     this.isOpen = true;
@@ -61,7 +61,7 @@ export class Modal extends Component<IModal> {
     this.events.emit("modal:open");
   }
 
-  // Закрываем модалку
+  // Закрываю модалку
   close() {
     if (!this.isOpen) return;
     this.isOpen = false;
@@ -70,7 +70,7 @@ export class Modal extends Component<IModal> {
     this.events.emit("modal:close");
   }
 
-  // Рендерим и открываем модалку
+  // Рендерю и открываю модалку
   render(data: IModal): HTMLElement {
     this.content = data.content;
     this.open();

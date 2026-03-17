@@ -1,14 +1,16 @@
 import { TPayment } from "../../types";
+import { IEvents } from "../base/Events";
 
 export class OrderData {
   private _payment: TPayment | null = null;
   private _email: string = "";
   private _phone: string = "";
   private _address: string = "";
+  
+   constructor(private events: IEvents) {}
 
   setPayment(value: TPayment): void {
     this._payment = value;
-    console.log("setPayment вызван:", value);
   }
 
   getPayment(): TPayment | null {
@@ -57,5 +59,6 @@ export class OrderData {
     this._address = "";
     this._email = "";
     this._phone = "";
+    this.events.emit('order:change');
   }
 }
