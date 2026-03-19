@@ -24,27 +24,24 @@ import type { IProduct, IOrderData } from "./types";
 // Утилиты
 import { API_URL } from "./utils/constants";
 import { apiProducts } from "./utils/data";
-import { cloneTemplate } from "./utils/utils";
+import { cloneTemplate, ensureElement } from "./utils/utils";
+import { CardCatalog } from "./components/views/CardCatalog";
 
 // Шаблоны
-export const cardCatalogTemplate =
-  document.querySelector<HTMLTemplateElement>("#card-catalog");
-const cardPreviewTemplate =
-  document.querySelector<HTMLTemplateElement>("#card-preview");
-const basketTemplate = document.querySelector<HTMLTemplateElement>("#basket");
-const basketItemTemplate =
-  document.querySelector<HTMLTemplateElement>("#card-basket");
-const orderFormTemplate = document.querySelector<HTMLTemplateElement>("#order");
-const contactsTemplate =
-  document.querySelector<HTMLTemplateElement>("#contacts");
-const successTemplate = document.querySelector<HTMLTemplateElement>("#success");
+const cardCatalogTemplate = ensureElement<HTMLTemplateElement>("#card-catalog");
+const cardPreviewTemplate = ensureElement<HTMLTemplateElement>("#card-preview");
+const basketTemplate = ensureElement<HTMLTemplateElement>("#basket");
+const basketItemTemplate = ensureElement<HTMLTemplateElement>("#card-basket");
+const orderFormTemplate = ensureElement<HTMLTemplateElement>("#order");
+const contactsTemplate = ensureElement<HTMLTemplateElement>("#contacts");
+const successTemplate = ensureElement<HTMLTemplateElement>("#success");
 
-if (!cardCatalogTemplate) throw new Error("Не найден шаблон #card-catalog");
-if (!cardPreviewTemplate) throw new Error("Не найден шаблон #card-preview");
-if (!basketTemplate) throw new Error("Не найден шаблон #basket");
-if (!orderFormTemplate) throw new Error("Не найден шаблон #order");
-if (!successTemplate) throw new Error("Не найден шаблон #success");
-if (!contactsTemplate) throw new Error("Не найден шаблон #contacts");
+// --- Создаём контейнеры ---
+const galleryContainer = document.querySelector<HTMLElement>(".gallery");
+if (!galleryContainer) throw new Error("Не найден .gallery");
+
+const modalContainer = document.querySelector<HTMLElement>("#modal-container");
+if (!modalContainer) throw new Error("Не найден #modal-container");
 
 // События
 const events = new EventEmitter();
@@ -58,13 +55,8 @@ const order = new OrderData(events);
 const apiClient = new Api(API_URL);
 const appApi = new API(apiClient);
 
-const galleryContainer = document.querySelector<HTMLElement>(".gallery");
-if (!galleryContainer) throw new Error("Не найден .gallery");
-
-const gallery = new Gallery(galleryContainer, events);
-
-const modalContainer = document.querySelector<HTMLElement>("#modal-container");
-if (!modalContainer) throw new Error("Не найден #modal-container");
+// Создаём Gallery
+const gallery = new Gallery(galleryContainer);
 
 const modal = new Modal(modalContainer, events);
 const header = new Header(
@@ -112,11 +104,6 @@ events.on("basket:open", () => {
 // Обработчик выбора товара
 events.on("product:select", (item: IProduct) => {
   catalog.setPreview(item);
-});
-
-// В обработчике items:loaded
-events.on("items:loaded", () => {
-  gallery.render(gallery.renderProductsAsElements(catalog.getItems()));
 });
 
 // Обработчик изменения превью
@@ -207,6 +194,21 @@ events.on("order:change", () => {
 function isBasketEmpty(): boolean {
   return basket.getItems().length === 0;
 }
+
+function renderCatalogItems(items: IProduct[]): HTMLElement[] {
+  return items.map((item) => {
+    const cardElement = cloneTemplate(cardCatalogTemplate);
+    const card = new CardCatalog(cardElement, {
+      onClick: () => events.emit("product:select", item),
+    });
+    card.render(item);
+    return cardElement;
+  });
+}
+
+events.on("items:loaded", () => {
+  gallery.render(renderCatalogItems(catalog.getItems()));
+});
 
 let currentStep = 1;
 let contactsForm: FormContacts | null = null;

@@ -25,7 +25,7 @@ export class CardPreview extends Card {
       this.container,
     );
   }
-
+  
   set buttonText(value: string) {
     this.button.textContent = value;
   }
