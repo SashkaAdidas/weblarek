@@ -6,12 +6,12 @@ export class OrderData {
   private _email: string = "";
   private _phone: string = "";
   private _address: string = "";
-  
-   constructor(private events: IEvents) {}
+
+  constructor(private events: IEvents) {}
 
   setPayment(value: TPayment): void {
     this._payment = value;
-    this.events.emit('order:change'); 
+    this.events.emit("order:change");
   }
 
   getPayment(): TPayment | null {
@@ -36,7 +36,6 @@ export class OrderData {
 
   setAddress(value: string): void {
     this._address = value;
-    
   }
 
   getAddress(): string {
@@ -61,6 +60,6 @@ export class OrderData {
     this._address = "";
     this._email = "";
     this._phone = "";
-    this.events.emit('order:change');
+    this.events.emit("order:change");
   }
 }

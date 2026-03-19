@@ -78,7 +78,7 @@ export class Card extends Component<ICard> {
 
   get item(): IProduct {
     if (!this._item) {
-      throw new Error('Item is not set');
+      throw new Error("Item is not set");
     }
     return this._item;
   }

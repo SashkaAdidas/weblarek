@@ -15,4 +15,3 @@ export class CardCatalog extends Card {
     }
   }
 }
-  

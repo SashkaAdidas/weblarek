@@ -16,25 +16,30 @@ export class CardPreview extends Card {
   ) {
     super(container);
 
-    this.descriptionElement = ensureElement<HTMLElement>(".card__text", this.container);
-    this.button = ensureElement<HTMLButtonElement>(".card__button", this.container);
+    this.descriptionElement = ensureElement<HTMLElement>(
+      ".card__text",
+      this.container,
+    );
+    this.button = ensureElement<HTMLButtonElement>(
+      ".card__button",
+      this.container,
+    );
   }
-  
+
   set buttonText(value: string) {
-  this.button.textContent = value;
-}
+    this.button.textContent = value;
+  }
 
   set buttonDisabled(value: boolean) {
-  this.button.disabled = value;
-}
+    this.button.disabled = value;
+  }
 
   set description(value: string) {
     this.descriptionElement.textContent = value;
   }
 
-  
   render(item: IProduct): HTMLElement {
-    super.render(item); // устанавливает title, price, category, image
+    super.render(item);
     this.description = item.description;
     this.button.onclick = () => {
       this.actions.onBuy(item);

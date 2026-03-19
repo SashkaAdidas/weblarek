@@ -10,7 +10,6 @@ import { EventEmitter } from "./components/base/Events";
 // Компоненты View
 import { Header } from "./components/views/Header";
 import { Modal } from "./components/views/Modal";
-import { CardCatalog } from "./components/views/CardCatalog";
 import { CardPreview } from "./components/views/CardPreview";
 import { BasketView } from "./components/views/BasketView";
 import { OrderForm } from "./components/views/OrderForm";
@@ -40,7 +39,6 @@ const contactsTemplate =
   document.querySelector<HTMLTemplateElement>("#contacts");
 const successTemplate = document.querySelector<HTMLTemplateElement>("#success");
 
-
 if (!cardCatalogTemplate) throw new Error("Не найден шаблон #card-catalog");
 if (!cardPreviewTemplate) throw new Error("Не найден шаблон #card-preview");
 if (!basketTemplate) throw new Error("Не найден шаблон #basket");
@@ -60,11 +58,8 @@ const order = new OrderData(events);
 const apiClient = new Api(API_URL);
 const appApi = new API(apiClient);
 
-// Представления
-// Контейнер галереи
 const galleryContainer = document.querySelector<HTMLElement>(".gallery");
 if (!galleryContainer) throw new Error("Не найден .gallery");
-
 
 const gallery = new Gallery(galleryContainer, events);
 
@@ -130,32 +125,31 @@ events.on("preview:changed", (data: { preview: IProduct }) => {
   const preview = data.preview;
 
   const card = new CardPreview(cardElement, {
-  onBuy: () => {
-    const item = catalog.getPreview(); // ← получаем из модели
-    if (item) {
-      if (basket.hasItem(item.id)) {
-        basket.remove(item.id);
-      } else {
-        basket.add(item);
+    onBuy: () => {
+      const item = catalog.getPreview();
+      if (item) {
+        if (basket.hasItem(item.id)) {
+          basket.remove(item.id);
+        } else {
+          basket.add(item);
+        }
+        modal.close();
       }
-      modal.close();
-    }
-  },
-});
+    },
+  });
 
   card.render(preview);
 
- // Потом устанавливаем состояние кнопки
-if (preview.price === null) {
-  card.buttonText = "Недоступно";
-  card.buttonDisabled = true;
-} else if (basket.hasItem(preview.id)) {
-  card.buttonText = "Удалить из корзины";
-  card.buttonDisabled = false;
-} else {
-  card.buttonText = "Купить";
-  card.buttonDisabled = false;
-}
+  if (preview.price === null) {
+    card.buttonText = "Недоступно";
+    card.buttonDisabled = true;
+  } else if (basket.hasItem(preview.id)) {
+    card.buttonText = "Удалить из корзины";
+    card.buttonDisabled = false;
+  } else {
+    card.buttonText = "Купить";
+    card.buttonDisabled = false;
+  }
 
   modal.render({ content: cardElement });
 });
@@ -250,7 +244,6 @@ events.on("order:addressChange", ({ value }: { value: string }) => {
   setOrderField("address", value);
 });
 
-
 // Обработка отправки формы
 events.on("form:submit", () => {
   if (currentStep === 1) {
@@ -279,7 +272,6 @@ events.on("form:submit", () => {
     };
 
     events.on("contacts:change", contactsChangeHandler);
-
     // Первоначальная валидация
     const step2Errors = order.validateStep2();
     contactsForm.valid = step2Errors.length === 0;
@@ -313,9 +305,9 @@ events.on("form:submit", () => {
     appApi
       .postOrder(orderData)
       .then((result) => {
-        basket.clear(); // очищаем корзину
-        order.clear(); // очищаем данные заказа
-        events.emit("order:change"); //  обновит формы: оплата, адрес и т.д.
+        basket.clear();
+        order.clear();
+        events.emit("order:change");
 
         modal.render({
           content: successView.render({ total: result.total }),

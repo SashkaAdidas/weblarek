@@ -3,13 +3,15 @@ import { Card } from "./Card";
 export class CardBasket extends Card {
   private removeButton: HTMLButtonElement | null;
 
-  constructor(container: HTMLElement, private onRemove: (id: string) => void
+  constructor(
+    container: HTMLElement,
+    private onRemove: (id: string) => void,
   ) {
     super(container);
 
     this.removeButton = container.querySelector(".basket__item-delete");
-    
-   if (this.removeButton) {
+
+    if (this.removeButton) {
       this.removeButton.addEventListener("click", (e) => {
         e.stopPropagation();
         // Явно указываем тип id из dataset
@@ -20,7 +22,7 @@ export class CardBasket extends Card {
       });
     }
   }
- 
+
   set index(value: number) {
     const badge = this.container.querySelector(".basket__item-index");
     badge!.textContent = value.toString();

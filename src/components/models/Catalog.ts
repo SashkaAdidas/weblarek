@@ -5,12 +5,12 @@ export class Catalog {
   private _items: IProduct[] = [];
   private _preview: IProduct | null = null;
 
-constructor(protected events: IEvents) {}
+  constructor(protected events: IEvents) {}
   // принимаем массив товаров и сохраняем
   setItems(items: IProduct[]): void {
-  this._items = items;
-  this.events.emit('catalog:updated', { items }); 
-}
+    this._items = items;
+    this.events.emit("catalog:updated", { items });
+  }
 
   // вернем копию массива
   getItems(): IProduct[] {
@@ -25,7 +25,7 @@ constructor(protected events: IEvents) {}
   // сохранит преданный товар как превью
   setPreview(item: IProduct): void {
     this._preview = item;
-    this.events.emit('preview:changed', { preview: item });
+    this.events.emit("preview:changed", { preview: item });
   }
 
   // вернет текущий превью-товар

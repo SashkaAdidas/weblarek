@@ -6,9 +6,9 @@ import { cardCatalogTemplate } from "../../main";
 import { IEvents } from "../base/Events";
 
 export class Gallery extends Component<HTMLElement[]> {
-   protected events: IEvents; 
+  protected events: IEvents;
 
-  constructor(container: HTMLElement, events: IEvents) { 
+  constructor(container: HTMLElement, events: IEvents) {
     super(container);
     this.events = events;
   }
@@ -22,7 +22,7 @@ export class Gallery extends Component<HTMLElement[]> {
     return items.map((item) => {
       const cardElement = cloneTemplate(cardCatalogTemplate!);
       const card = new CardCatalog(cardElement, {
-        onClick: () => this.events.emit("product:select", item), // использовать this.events
+        onClick: () => this.events.emit("product:select", item),
       });
       card.render(item);
       return cardElement;

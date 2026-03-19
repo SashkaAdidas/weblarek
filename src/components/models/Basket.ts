@@ -1,4 +1,4 @@
-                                              // ИСПРАВЛЕНО
+// ИСПРАВЛЕНО
 import { IProduct } from "../../types";
 import { IEvents } from "../base/Events";
 
@@ -29,7 +29,7 @@ export class Basket {
 
   getTotal(): number {
     return this._items.reduce((sum, item) => {
-      return sum + (typeof item.price === 'number' ? item.price : 0);
+      return sum + (typeof item.price === "number" ? item.price : 0);
     }, 0);
   }
 
@@ -41,4 +41,4 @@ export class Basket {
     this._items = [];
     this.events.emit("basket:changed");
   }
-}                                       
+}
