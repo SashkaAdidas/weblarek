@@ -54,14 +54,10 @@ export class OrderForm extends Form<IOrderFormState> {
   set payment(value: string | null) {
     this._payment = value;
     this.selectPayment(value);
-    if (value) {
-      this.events.emit("order:paymentChange", { value });
-    }
   }
 
   set address(value: string) {
     this.addressInput.value = value;
-    this.events.emit("order:addressChange", { value });
   }
 
   selectPayment(method: string | null) {

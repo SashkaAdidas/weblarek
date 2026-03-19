@@ -9,7 +9,7 @@ constructor(protected events: IEvents) {}
   // принимаем массив товаров и сохраняем
   setItems(items: IProduct[]): void {
   this._items = items;
-  this.events.emit('catalog:updated', { items }); // ← событие
+  this.events.emit('catalog:updated', { items }); 
 }
 
   // вернем копию массива
@@ -25,6 +25,7 @@ constructor(protected events: IEvents) {}
   // сохранит преданный товар как превью
   setPreview(item: IProduct): void {
     this._preview = item;
+    this.events.emit('preview:changed', { preview: item });
   }
 
   // вернет текущий превью-товар

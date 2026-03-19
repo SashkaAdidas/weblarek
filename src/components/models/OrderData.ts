@@ -11,6 +11,7 @@ export class OrderData {
 
   setPayment(value: TPayment): void {
     this._payment = value;
+    this.events.emit('order:change'); 
   }
 
   getPayment(): TPayment | null {
@@ -35,6 +36,7 @@ export class OrderData {
 
   setAddress(value: string): void {
     this._address = value;
+    
   }
 
   getAddress(): string {

@@ -14,6 +14,7 @@ export class Card extends Component<ICard> {
   protected imageElement?: HTMLImageElement;
   protected priceElement: HTMLElement;
   protected categoryElement?: HTMLElement | null = null;
+  protected _item: IProduct | null = null;
 
   constructor(container: HTMLElement) {
     super(container);
@@ -75,8 +76,16 @@ export class Card extends Component<ICard> {
     }
   }
 
+  get item(): IProduct {
+    if (!this._item) {
+      throw new Error('Item is not set');
+    }
+    return this._item;
+  }
+
   render(data: IProduct): HTMLElement {
     super.render(data);
+    this._item = data;
     this.title = data.title;
     this.price = data.price;
 

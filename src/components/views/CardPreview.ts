@@ -9,7 +9,6 @@ interface ICardActions {
 export class CardPreview extends Card {
   protected descriptionElement: HTMLElement;
   protected button: HTMLButtonElement;
-  private itemData: IProduct | null = null;
 
   constructor(
     container: HTMLElement,
@@ -17,43 +16,30 @@ export class CardPreview extends Card {
   ) {
     super(container);
 
-    this.descriptionElement = ensureElement<HTMLElement>(
-      ".card__text",
-      this.container,
-    );
-    this.button = ensureElement<HTMLButtonElement>(
-      ".card__button",
-      this.container,
-    );
-
-    this.button.addEventListener("click", () => {
-      if (this.itemData && !this.button.disabled) {
-        this.actions.onBuy(this.itemData);
-      }
-    });
+    this.descriptionElement = ensureElement<HTMLElement>(".card__text", this.container);
+    this.button = ensureElement<HTMLButtonElement>(".card__button", this.container);
   }
+  
+  set buttonText(value: string) {
+  this.button.textContent = value;
+}
+
+  set buttonDisabled(value: boolean) {
+  this.button.disabled = value;
+}
 
   set description(value: string) {
     this.descriptionElement.textContent = value;
   }
 
+  
   render(item: IProduct): HTMLElement {
-    this.itemData = item;
-    super.render(item);
+    super.render(item); // устанавливает title, price, category, image
     this.description = item.description;
-    return this.container;
-  }
+    this.button.onclick = () => {
+      this.actions.onBuy(item);
+    };
 
-  updateButton(isInBasket: boolean, price: number | null) {
-    if (price === null) {
-      this.button.textContent = "Недоступно";
-      this.button.disabled = true;
-    } else if (isInBasket) {
-      this.button.textContent = "Удалить из корзины";
-      this.button.disabled = false;
-    } else {
-      this.button.textContent = "Купить";
-      this.button.disabled = false;
-    }
+    return this.container;
   }
 }
