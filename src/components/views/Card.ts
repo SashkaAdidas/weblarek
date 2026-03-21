@@ -45,7 +45,7 @@ export class Card extends Component<ICard> {
 
   set price(value: number | null) {
     if (value === null) {
-      this.priceElement.textContent = "Недоступно";
+      this.priceElement.textContent = "Бесценно";
     } else {
       this.priceElement.textContent = `${value} синапсов`;
     }
@@ -55,7 +55,6 @@ export class Card extends Component<ICard> {
     if (this.categoryElement) {
       this.categoryElement.textContent = value;
 
-      // Удаляю все возможные классы категорий
       Object.values(categoryMap).forEach((cls) => {
         const className = cls.split(".").pop();
         if (className) {
@@ -63,7 +62,6 @@ export class Card extends Component<ICard> {
         }
       });
 
-      // Проверяю, есть ли такой ключ в объекте
       const cssClass =
         value in categoryMap
           ? categoryMap[value as keyof typeof categoryMap]

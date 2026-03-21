@@ -3,6 +3,10 @@ import { IProduct } from "../../types";
 import { IEvents } from "../base/Events";
 
 export class Basket {
+  isEmpty(): boolean {
+     return this._items.length === 0;
+   
+  }
   private _items: IProduct[] = [];
 
   constructor(private events: IEvents) {}

@@ -6,10 +6,11 @@ export class Catalog {
   private _preview: IProduct | null = null;
 
   constructor(protected events: IEvents) {}
+
   // принимаем массив товаров и сохраняем
   setItems(items: IProduct[]): void {
     this._items = items;
-    this.events.emit("catalog:updated", { items });
+    this.events.emit("items:loaded");
   }
 
   // вернем копию массива

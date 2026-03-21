@@ -24,9 +24,8 @@ export class Success extends Component<ISuccess> {
       this.container,
     );
 
-    // Закрытие по кнопке
     this.button.addEventListener("click", () => {
-      this.events.emit("modal:close");
+      this.events.emit("success:close");
     });
   }
 

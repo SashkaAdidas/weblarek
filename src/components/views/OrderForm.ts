@@ -11,7 +11,7 @@ export class OrderForm extends Form<IOrderFormState> {
   protected addressInput: HTMLInputElement;
   protected paymentButtons: HTMLButtonElement[];
   protected errorsElement: HTMLElement;
-  protected _payment: string | null = null;
+  protected submitButton: HTMLButtonElement;
 
   constructor(container: HTMLElement, events: IEvents) {
     super(container, events);
@@ -32,54 +32,44 @@ export class OrderForm extends Form<IOrderFormState> {
       this.container,
     );
 
-    // Слушаем изменения адреса
+    this.container.addEventListener("submit", (e) => {
+      e.preventDefault();
+      this.events.emit("order:submit");
+    });
+
     this.addressInput.addEventListener("input", () => {
-      this.events.emit("order:addressChange", {
+      this.events.emit("form:change", {
+        field: "address",
         value: this.addressInput.value,
       });
     });
 
-    // Слушаем выбор способа оплаты
     this.paymentButtons.forEach((button) => {
       button.addEventListener("click", () => {
-        this.paymentButtons.forEach((btn) =>
-          btn.classList.remove("button_alt-active"),
-        );
-        button.classList.add("button_alt-active");
-        this.events.emit("order:paymentChange", { value: button.name });
+        this.events.emit("form:change", {
+          field: "payment",
+          value: button.name,
+        });
       });
     });
   }
 
   set payment(value: string | null) {
-    this._payment = value;
-    this.selectPayment(value);
+    this.paymentButtons.forEach((button) => {
+      button.classList.toggle("button_alt-active", button.name === value);
+    });
   }
 
   set address(value: string) {
     this.addressInput.value = value;
   }
 
-  selectPayment(method: string | null) {
-    this.paymentButtons.forEach((button) => {
-      button.classList.toggle("button_alt-active", button.name === method);
-    });
-  }
-
-  clear() {
-    this.addressInput.value = "";
-    this.paymentButtons.forEach((btn) =>
-      btn.classList.remove("button_alt-active"),
-    );
-    this.errors = [];
-    this.valid = false;
-  }
   set errors(value: string[]) {
     this.errorsElement.textContent = value.join(", ");
+    this.valid = value.length === 0;
   }
+
   set valid(value: boolean) {
-    if (this.submitButton) {
-      this.submitButton.disabled = !value;
-    }
+    this.submitButton.disabled = !value;
   }
 }

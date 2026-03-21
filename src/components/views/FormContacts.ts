@@ -10,6 +10,7 @@ interface IFormContactsData {
 export class FormContacts extends Form<IFormContactsData> {
   protected emailInput: HTMLInputElement;
   protected phoneInput: HTMLInputElement;
+  protected submitButton: HTMLButtonElement;
 
   constructor(container: HTMLElement, events: IEvents) {
     super(container, events);
@@ -31,10 +32,14 @@ export class FormContacts extends Form<IFormContactsData> {
       this.container,
     );
 
-    // Слушаю изменения полей
+    this.container.addEventListener("submit", (e) => {
+      e.preventDefault();
+      this.events.emit("contacts:submit");
+    });
+
     [this.emailInput, this.phoneInput].forEach((input) => {
       input.addEventListener("input", () => {
-        this.events.emit("contacts:change", {
+        this.events.emit("form:change", {
           field: input.name,
           value: input.value,
         });
@@ -49,7 +54,13 @@ export class FormContacts extends Form<IFormContactsData> {
   set phone(value: string) {
     this.phoneInput.value = value;
   }
+
   set errors(value: string[]) {
     this.errorsElement.textContent = value.join(", ");
+    this.valid = value.length === 0;
+  }
+
+  set valid(value: boolean) {
+    this.submitButton.disabled = !value;
   }
 }

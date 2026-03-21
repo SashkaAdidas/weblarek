@@ -11,7 +11,7 @@ export class OrderData {
 
   setPayment(value: TPayment): void {
     this._payment = value;
-    this.events.emit("order:change");
+    this.events.emit("buyer:changed");
   }
 
   getPayment(): TPayment | null {
@@ -20,6 +20,7 @@ export class OrderData {
 
   setEmail(value: string): void {
     this._email = value;
+    this.events.emit("buyer:changed");
   }
 
   getEmail(): string {
@@ -28,6 +29,7 @@ export class OrderData {
 
   setPhone(value: string): void {
     this._phone = value;
+    this.events.emit("buyer:changed");
   }
 
   getPhone(): string {
@@ -36,6 +38,7 @@ export class OrderData {
 
   setAddress(value: string): void {
     this._address = value;
+    this.events.emit("buyer:changed");
   }
 
   getAddress(): string {
@@ -55,11 +58,12 @@ export class OrderData {
     if (!this._phone) errors.push("Требуется телефон");
     return errors;
   }
-  clear() {
+
+  clear(): void {
     this._payment = null;
     this._address = "";
     this._email = "";
     this._phone = "";
-    this.events.emit("order:change");
+    this.events.emit("buyer:changed");
   }
 }

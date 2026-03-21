@@ -33,12 +33,12 @@ export class BasketView extends Component<IBasket> {
     );
 
     this.button.addEventListener("click", () => {
-      this.events.emit("basket:order");
+      this.events.emit("order:open");
     });
   }
 
   set items(items: HTMLElement[]) {
-    if (items.length === 0) {
+    if ((this.disabled = items.length === 0)) {
       this.listContainer.innerHTML = "<p>Корзина пуста</p>";
     } else {
       this.listContainer.replaceChildren(...items);

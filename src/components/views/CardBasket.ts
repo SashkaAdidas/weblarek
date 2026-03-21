@@ -2,6 +2,7 @@ import { Card } from "./Card";
 
 export class CardBasket extends Card {
   private removeButton: HTMLButtonElement | null;
+  element: any;
 
   constructor(
     container: HTMLElement,
@@ -14,7 +15,6 @@ export class CardBasket extends Card {
     if (this.removeButton) {
       this.removeButton.addEventListener("click", (e) => {
         e.stopPropagation();
-        // Явно указываем тип id из dataset
         const id = this.container.dataset.id;
         if (id) {
           this.onRemove(id);

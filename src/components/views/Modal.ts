@@ -11,13 +11,9 @@ export class Modal extends Component<IModal> {
   protected closeButton: HTMLButtonElement;
   private isOpen = false;
 
-  constructor(
-    container: HTMLElement,
-    protected events: IEvents,
-  ) {
+  constructor(container: HTMLElement, protected events: IEvents) {
     super(container);
 
-    // Ищю контейнер и кнопку закрытия
     this.modalContent = ensureElement<HTMLElement>(
       ".modal__container",
       this.container,
@@ -27,50 +23,36 @@ export class Modal extends Component<IModal> {
       this.container,
     );
 
-    // Закрытие по клику на оверлее
     this.container.addEventListener("click", (e) => {
       if (e.target === this.container) {
         this.close();
       }
     });
 
-    // Закрытие по крестику
-    this.closeButton.addEventListener("click", (e) => {
-      this.close();
-    });
-
-    // Подписываемся на внешнее событие закрытия
-    events.on("modal:close", () => {
+    this.closeButton.addEventListener("click", () => {
       this.close();
     });
   }
 
-  // Устанавливаю контент внутрь модального окна
   set content(value: HTMLElement) {
     this.modalContent.replaceChildren();
     this.modalContent.appendChild(this.closeButton);
     this.modalContent.appendChild(value);
   }
 
-  // Открываю модалку
   open() {
     if (this.isOpen) return;
     this.isOpen = true;
     this.container.classList.add("modal_active");
-    document.body.style.overflow = "hidden";
-    this.events.emit("modal:open");
+    document.body.style.overflow = "";
   }
 
-  // Закрываю модалку
   close() {
     if (!this.isOpen) return;
     this.isOpen = false;
     this.container.classList.remove("modal_active");
-    document.body.style.overflow = "";
-    this.events.emit("modal:close");
   }
 
-  // Рендерю и открываю модалку
   render(data: IModal): HTMLElement {
     this.content = data.content;
     this.open();
